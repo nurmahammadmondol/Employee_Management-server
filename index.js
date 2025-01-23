@@ -23,6 +23,19 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    // const EmployeeManagement_Colleaction = client
+    //   .db('Employee_Management')
+    //   .collection('Latest_News');
+
+    const database = client.db('Employee_Management');
+    const EmployeeManagement_LatestNews = database.collection('Latest_News');
+
+    app.get('/latest-news', async (req, res) => {
+      const filter = await EmployeeManagement_LatestNews.find().toArray();
+      res.send(filter);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
