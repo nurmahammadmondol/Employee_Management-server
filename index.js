@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,16 +24,61 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    // const EmployeeManagement_Colleaction = client
-    //   .db('Employee_Management')
-    //   .collection('Latest_News');
-
     const database = client.db('Employee_Management');
     const EmployeeManagement_LatestNews = database.collection('Latest_News');
+
+    const EmployeeManagement_NewUser = database.collection('User');
+
+    const EmployeeManagement_EmployeeWorkSheet =
+      database.collection('Work_Sheet');
+
+    // Latest News :
 
     app.get('/latest-news', async (req, res) => {
       const filter = await EmployeeManagement_LatestNews.find().toArray();
       res.send(filter);
+    });
+
+    app.get('/latest-news/:id', async (req, res) => {
+      const ID = req.params.id;
+      const RealID = { _id: new ObjectId(ID) };
+      const result = await EmployeeManagement_LatestNews.findOne(RealID);
+      res.send(result);
+    });
+
+    // User :
+
+    app.get('/User', async (req, res) => {
+      const filter = await EmployeeManagement_NewUser.find().toArray();
+      res.send(filter);
+    });
+
+    app.post('/User', async (req, res) => {
+      const Data = req.body;
+      // console.log(Data);
+
+      const quary = { Email: Data?.Email };
+      const axistingUser = await EmployeeManagement_NewUser.findOne(quary);
+      if (axistingUser) {
+        return res.send({ message: 'user already exists' });
+      }
+
+      const result = await EmployeeManagement_NewUser.insertOne(Data);
+      res.send(result);
+    });
+
+    // Employee Work Sheet :
+
+    app.get('/WorkSheet', async (req, res) => {
+      const filter =
+        await EmployeeManagement_EmployeeWorkSheet.find().toArray();
+      res.send(filter);
+    });
+
+    app.post('/WorkSheet', async (req, res) => {
+      const Data = req.body;
+      const result = await EmployeeManagement_EmployeeWorkSheet.insertOne(Data);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
