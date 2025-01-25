@@ -81,6 +81,16 @@ async function run() {
       res.send(result);
     });
 
+    app.delete('/WorkSheet/:id', async (req, res) => {
+      const ID = req.params.id;
+      const findData = { _id: new ObjectId(ID) };
+      const result = await EmployeeManagement_EmployeeWorkSheet.deleteOne(
+        findData
+      );
+
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 });
     console.log(
