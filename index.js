@@ -77,6 +77,32 @@ async function run() {
       res.send(result);
     });
 
+    app.patch('/User/:id', async (req, res) => {
+      const Data = req.body;
+
+      // console.log(Data);
+      const ID = req.params.id;
+      const filter = { _id: new ObjectId(ID) };
+      // console.log(Data, filter);
+
+      const updateDoc = {
+        $set: {
+          Name: Data?.Name,
+          Email: Data?.Email,
+          Photo: Data?.Photo,
+          UserRole: Data?.UserRole,
+          verified: Data?.verified,
+          dismiss: Data?.Dismiss,
+        },
+      };
+
+      const result = await EmployeeManagement_NewUser.updateOne(
+        filter,
+        updateDoc
+      );
+      res.send(result);
+    });
+
     // Employee Work Sheet :
 
     app.get('/WorkSheet', async (req, res) => {
@@ -141,6 +167,25 @@ async function run() {
       const Data = req.body;
       // console.log(Data);
       const result = await EmployeeManagement_PaymentRequest.insertOne(Data);
+      res.send(result);
+    });
+
+    app.patch('/Payment_Request/:id', async (req, res) => {
+      const { salary } = req.body;
+      const ID = req.params.id;
+      const filter = { _id: new ObjectId(ID) };
+      console.log('Received Salary:', salary, 'Filter:', filter);
+
+      const updateDoc = {
+        $set: {
+          salary: salary, // Make sure this matches the field in your database
+        },
+      };
+
+      const result = await EmployeeManagement_PaymentRequest.updateOne(
+        filter,
+        updateDoc
+      );
       res.send(result);
     });
 
