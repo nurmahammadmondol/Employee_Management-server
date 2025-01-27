@@ -32,6 +32,9 @@ async function run() {
     const EmployeeManagement_EmployeeWorkSheet =
       database.collection('Work_Sheet');
 
+    const EmployeeManagement_PaymentRequest =
+      database.collection('Payment_Request');
+
     // Latest News :
 
     app.get('/latest-news', async (req, res) => {
@@ -50,6 +53,13 @@ async function run() {
 
     app.get('/User', async (req, res) => {
       const filter = await EmployeeManagement_NewUser.find().toArray();
+      res.send(filter);
+    });
+
+    app.get('/User/:id', async (req, res) => {
+      const ID = req.params.id;
+      const quary = { _id: new ObjectId(ID) };
+      const filter = await EmployeeManagement_NewUser.findOne(quary);
       res.send(filter);
     });
 
@@ -75,9 +85,38 @@ async function run() {
       res.send(filter);
     });
 
+    app.get(`/WorkSheet/:id`, async (req, res) => {
+      const ID = req.params.id;
+      const queery = { _id: new ObjectId(ID) };
+      const filter = await EmployeeManagement_EmployeeWorkSheet.findOne(queery);
+      res.send(filter);
+    });
+
     app.post('/WorkSheet', async (req, res) => {
       const Data = req.body;
       const result = await EmployeeManagement_EmployeeWorkSheet.insertOne(Data);
+      res.send(result);
+    });
+
+    app.patch('/WorkSheet/:id', async (req, res) => {
+      const Data = req.body;
+
+      const ID = req.params.id;
+      const filter = { _id: new ObjectId(ID) };
+      // console.log(Data, filter);
+
+      const updateDoc = {
+        $set: {
+          tasks: Data.tasks,
+          WorkingTime: Data.WorkingTime,
+          startDate: Data.startDate,
+        },
+      };
+
+      const result = await EmployeeManagement_EmployeeWorkSheet.updateOne(
+        filter,
+        updateDoc
+      );
       res.send(result);
     });
 
@@ -88,6 +127,20 @@ async function run() {
         findData
       );
 
+      res.send(result);
+    });
+
+    // Payment Request
+
+    app.get('/Payment_Request', async (req, res) => {
+      const result = await EmployeeManagement_PaymentRequest.find().toArray();
+      res.send(result);
+    });
+
+    app.post('/Payment_Request', async (req, res) => {
+      const Data = req.body;
+      // console.log(Data);
+      const result = await EmployeeManagement_PaymentRequest.insertOne(Data);
       res.send(result);
     });
 
