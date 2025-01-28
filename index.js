@@ -171,22 +171,39 @@ async function run() {
     });
 
     app.patch('/Payment_Request/:id', async (req, res) => {
-      const { salary } = req.body;
+      const { approvedTime, request, salary } = req.body; // Relevant fields destructured
       const ID = req.params.id;
       const filter = { _id: new ObjectId(ID) };
-      console.log('Received Salary:', salary, 'Filter:', filter);
 
+      // Update only provided fields
       const updateDoc = {
-        $set: {
-          salary: salary, // Make sure this matches the field in your database
-        },
+        $set: {},
       };
 
-      const result = await EmployeeManagement_PaymentRequest.updateOne(
-        filter,
-        updateDoc
-      );
-      res.send(result);
+      if (approvedTime !== undefined) {
+        updateDoc.$set.approvedTime = approvedTime;
+      }
+
+      if (request !== undefined) {
+        updateDoc.$set.request = request;
+      }
+
+      if (salary !== undefined) {
+        updateDoc.$set.salary = salary;
+      }
+
+      // console.log('Received Data:', updateDoc);
+
+      try {
+        const result = await EmployeeManagement_PaymentRequest.updateOne(
+          filter,
+          updateDoc
+        );
+        res.send(result); // Send success response
+      } catch (error) {
+        // console.error('Error updating document:', error);
+        res.status(500).send('Failed to update document');
+      }
     });
 
     // Send a ping to confirm a successful connection
